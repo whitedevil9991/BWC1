@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+interface ITransactionObject {
+    // Define the interface functions here
+}
+
 contract CarbonToken {
     string public name;
     string public symbol;
@@ -41,6 +45,8 @@ contract CarbonDApp {
     event RedeemCarbon(address indexed from, uint256 value);
     event ContractPaused();
     event ContractUnpaused();
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event CarbonTokenUpgraded(address indexed previousCarbonToken, address indexed newCarbonToken);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the contract owner can perform this action");
@@ -91,12 +97,18 @@ contract CarbonDApp {
     function transferOwnership(address newOwner) external onlyOwner {
         require(newOwner != address(0), "Invalid new owner address");
 
+        address previousOwner = owner;
         owner = newOwner;
+
+        emit OwnershipTransferred(previousOwner, newOwner);
     }
 
     function upgradeCarbonToken(address newCarbonTokenAddress) external onlyOwner {
         require(newCarbonTokenAddress != address(0), "Invalid new CarbonToken address");
 
+        address previousCarbonToken = address(carbonToken);
         carbonToken = CarbonToken(newCarbonTokenAddress);
+
+        emit CarbonTokenUpgraded(previousCarbonToken, newCarbonTokenAddress);
     }
 }
