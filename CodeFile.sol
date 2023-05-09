@@ -39,6 +39,8 @@ contract CarbonDApp {
 
     event OffsetCarbon(address indexed from, uint256 value);
     event RedeemCarbon(address indexed from, uint256 value);
+    event ContractPaused();
+    event ContractUnpaused();
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the contract owner can perform this action");
@@ -52,8 +54,8 @@ contract CarbonDApp {
 
     constructor(address _carbonTokenAddress) {
         carbonToken = CarbonToken(_carbonTokenAddress);
-        owner = msg.sender; // Set the contract owner
-        paused = false; // Initialize the contract as not paused
+        owner = msg.sender;
+        paused = false;
     }
 
     function offsetCarbon(uint256 _value) external whenNotPaused {
@@ -77,21 +79,21 @@ contract CarbonDApp {
     }
 
     function pauseContract() external onlyOwner {
-        paused = true; // Pause the contract
+        paused = true;
+        emit ContractPaused();
     }
 
     function unpauseContract() external onlyOwner {
-        paused = false; // Unpause the contract
+        paused = false;
+        emit ContractUnpaused();
     }
 
-    // Function to transfer ownership of the contract to a new address
     function transferOwnership(address newOwner) external onlyOwner {
         require(newOwner != address(0), "Invalid new owner address");
 
         owner = newOwner;
     }
 
-    // Function to upgrade the CarbonToken contract
     function upgradeCarbonToken(address newCarbonTokenAddress) external onlyOwner {
         require(newCarbonTokenAddress != address(0), "Invalid new CarbonToken address");
 
